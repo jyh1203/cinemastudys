@@ -2,7 +2,7 @@ import type { StudyAbroadLabel } from './types';
 
 export const STUDY_ABROAD_LABELS: StudyAbroadLabel[] = [
   {
-    name: "라벨 선택..",
+    name: "라벨 선택...",
     scenes: [],
     tags: [],
   },
