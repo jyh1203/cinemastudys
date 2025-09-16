@@ -1,0 +1,5 @@
+{
+  "name": "Actor Filter and Details",
+  "description": "An application to filter Korean actors based on their filmography, scenes, and special characteristics. Users can select predefined labels or individual criteria to find actors, and view detailed information about them.",
+  "requestFramePermissions": []
+}
