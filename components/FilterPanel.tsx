@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { StudyAbroadLabel } from '../types';
 
 interface FilterPanelProps {
@@ -70,10 +69,39 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     onStudyAbroadChange,
     onReset,
 }) => {
+    const getLabelColorClass = (name: string): string => {
+        const match = name.match(/\((\d+)\)/);
+        if (match) {
+            const count = parseInt(match[1], 10);
+            switch (count) {
+                case 8: return 'bg-purple-600 text-white';
+                case 6: return 'bg-yellow-500 text-slate-900';
+                case 4: return 'bg-blue-600 text-white';
+                case 2: return 'bg-gray-500 text-white';
+                default: return 'bg-slate-700 text-slate-100';
+            }
+        }
+        return 'bg-slate-700 text-slate-100';
+    };
+
+    const [selectBgColor, setSelectBgColor] = useState(getLabelColorClass(''));
+
+    useEffect(() => {
+        // Reset color and dropdown selection when filters are cleared externally
+        if (selectedScenes.size === 0 && selectedTags.size === 0) {
+            const selectElement = document.getElementById('study-abroad') as HTMLSelectElement;
+            if (selectElement) {
+                selectElement.selectedIndex = 0;
+            }
+            setSelectBgColor(getLabelColorClass(''));
+        }
+    }, [selectedScenes, selectedTags]);
+
     const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedLabel = studyAbroadLabels.find(label => label.name === e.target.value);
         if (selectedLabel) {
             onStudyAbroadChange(selectedLabel);
+            setSelectBgColor(getLabelColorClass(selectedLabel.name));
         }
     };
     
@@ -84,14 +112,20 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                 <select
                     id="study-abroad"
                     onChange={handleDropdownChange}
-                    className="w-full bg-slate-700 border-slate-600 rounded-md p-2 focus:ring-cyan-500 focus:border-cyan-500"
+                    className={`w-full border-slate-600 rounded-md p-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors duration-300 ${selectBgColor}`}
                 >
                     {studyAbroadLabels.map(label => (
-                        <option key={label.name} value={label.name}>
+                        <option key={label.name} value={label.name} className="bg-slate-700 text-slate-100">
                             {label.name}
                         </option>
                     ))}
                 </select>
+                <div className="mt-3 text-xs grid grid-cols-2 gap-x-4 gap-y-1 text-slate-400">
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-purple-600 mr-2 border border-slate-500"></span>(8) Items</div>
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-yellow-500 mr-2 border border-slate-500"></span>(6) Items</div>
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-blue-600 mr-2 border border-slate-500"></span>(4) Items</div>
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-gray-500 mr-2 border border-slate-500"></span>(2) Items</div>
+                </div>
             </div>
 
             <FilterSection title="시나리오 (Scenes)" items={allScenes} selectedItems={selectedScenes} onToggle={onSceneToggle} />
